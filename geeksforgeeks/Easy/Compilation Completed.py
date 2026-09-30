@@ -1,37 +1,42 @@
 class Solution {
-    public long inversionCount(int arr[]) {
+    public int median(int[][] mat) {
         // code here
-        return mergeSort(arr, 0, arr.length-1);
-    }
-    public long mergeSort(int[] arr, int left, int right){
-        long count = 0;
-        if(left < right){
-            int mid = (left + right)/2;
-            count += mergeSort(arr, left, mid);
-            count += mergeSort(arr, mid+1, right);
-            count += merge(arr, left, mid, right);
+        int n = mat.length, m = mat[0].length;
+        int low = Integer.MAX_VALUE, high = Integer.MIN_VALUE;
+        for(int i=0;i<n;i++){
+            low = Math.min(low, mat[i][0]);
+            high = Math.max(high, mat[i][m-1]);
         }
-        return count;
-    }
-    public long merge(int[] arr, int left, int mid, int right){
-        int[] leftArr = Arrays.copyOfRange(arr, left, mid+1);
-        int[] rightArr = Arrays.copyOfRange(arr, mid+1, right+1);
-        int i = 0, j = 0, k = left;
-        long count = 0;
-        while(i < leftArr.length && j < rightArr.length){
-            if(leftArr[i] <= rightArr[j]){
-                arr[k++] = leftArr[i++];
+        int required = (n*m)/2;
+        while(low <= high){
+            int mid = low + (high - low)/2;
+            int SmallerEquals = findSmaller(mat, mid);
+            if(SmallerEquals <= required){
+                low = mid + 1;
             } else{
-                arr[k++] = rightArr[j++];
-                count += (leftArr.length - i);
+                high = mid - 1;
             }
         }
-        while(i < leftArr.length){
-            arr[k++] = leftArr[i++];
-        }
-        while(j < rightArr.length){
-            arr[k++] = rightArr[j++];
+        return low;
+    }
+    public int findSmaller(int[][] mat, int element){
+        int count = 0;
+        for(int i = 0; i < mat.length; i++){
+            count += upperBound(mat[i], element);
         }
         return count;
+    }
+    public int upperBound(int[] arr, int target){
+        int left = 0, right = arr.length - 1, ans = arr.length;
+        while(left <= right){
+            int mid = left + (right - left)/2;
+            if(arr[mid] <= target)
+                left = mid + 1;
+            else{
+                ans = mid;
+                right = mid - 1;
+            }
+        }
+        return ans;
     }
 }
